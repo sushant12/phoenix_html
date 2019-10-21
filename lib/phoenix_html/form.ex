@@ -253,7 +253,7 @@ defmodule Phoenix.HTML.Form do
           impl: module,
           id: String.t(),
           index: nil | non_neg_integer,
-          action: nil | String.t
+          action: nil | String.t()
         }
 
   @type field :: atom | String.t()
@@ -405,6 +405,7 @@ defmodule Phoenix.HTML.Form do
   def inputs_for(%{impl: impl} = form, field, options \\ [], fun)
       when is_atom(field) or is_binary(field) do
     {skip, options} = Keyword.pop(options, :skip_hidden, false)
+    html_options = options[:html] || []
 
     options =
       form.options
@@ -414,14 +415,18 @@ defmodule Phoenix.HTML.Form do
     forms = impl.to_form(form.source, form, field, options)
 
     html_escape(
-      Enum.map(forms, fn form ->
-        if skip do
-          fun.(form)
-        else
-          hidden = Enum.map(form.hidden, fn {k, v} -> hidden_input(form, k, value: v) end)
-          [hidden, fun.(form)]
-        end
-      end)
+      content_tag(
+        :div,
+        Enum.map(forms, fn form ->
+          if skip do
+            fun.(form)
+          else
+            hidden = Enum.map(form.hidden, fn {k, v} -> hidden_input(form, k, value: v) end)
+            [hidden, fun.(form)]
+          end
+        end),
+        html_options
+      )
     )
   end
 
