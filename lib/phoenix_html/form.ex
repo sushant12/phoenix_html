@@ -400,12 +400,14 @@ defmodule Phoenix.HTML.Form do
       markup. You can access `form.hidden` to generate them manually
       within the supplied callback.
 
+    * `:html` - the value to a
+
   """
   @spec inputs_for(t, field, Keyword.t(), (t -> Phoenix.HTML.unsafe())) :: Phoenix.HTML.safe()
   def inputs_for(%{impl: impl} = form, field, options \\ [], fun)
       when is_atom(field) or is_binary(field) do
     {skip, options} = Keyword.pop(options, :skip_hidden, false)
-    html_options = options[:html] || []
+    {html_option, options} = Keyword.pop(options, :html, [])
 
     options =
       form.options
